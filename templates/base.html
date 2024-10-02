@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <link href="/assets/main.css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://unpkg.com/7.css">
+        <script src="/assets/htmx.min.js"></script>
+        <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
+        <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/json-enc.js"></script>
+        <!-- Allow any inheriting page to set it's own title -->
+        <title>{% block title %}{{ title }}{% endblock %}</title>
+
+        <!-- Allow any inheriting page to extend head with additional assets -->
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Lexend:wght@100;200;300;400;500;600;700;800;900&display=swap");
+
+            /* * {
+                font-family: Lexend;
+            } */
+        </style>
+        {% block head %}{% endblock %}
+    </head>
+    <body class="">
+        <div id="content">
+            <!-- Inheriting pages will have their content rendered here, similar to app root in React, Angular, etc. -->
+            {% block content %}{% endblock %}
+        </div>
+    </body>
+</html>

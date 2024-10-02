@@ -1,0 +1,5 @@
+[x] Add webcam outline. 
+[ ] Make it so you can only redeem a code once.
+[ ] Setup plugin system instead of hardcoding entrypoints
+[ ] Brainstorm mini games / other features.
+[ ] great success 

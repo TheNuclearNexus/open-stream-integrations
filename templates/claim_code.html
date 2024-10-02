@@ -1,0 +1,132 @@
+<style>
+  @keyframes code-entrance {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes code-exit {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes lose-progress {
+    0% {
+      width: 0%;
+    }
+    100% {
+      width: 100%;
+    }
+  }
+
+  :root {
+    --control-background: linear-gradient(
+      rgba(255, 255, 255, 0.5),
+      rgba(255, 255, 255, 0.3) 45%,
+      rgba(0, 0, 0, 0.1) 50%,
+      rgba(0, 0, 0, 0.1) 75%,
+      rgba(255, 255, 255, 0.5)
+    );
+    --control-background-close-active: radial-gradient(
+        circle at 50% 170%,
+        #dcc03f 10% 20%,
+        #0000 60%
+      ),
+      radial-gradient(circle at -60% 50%, #000 5% 10%, #0000 50%),
+      radial-gradient(circle at 160% 50%, #000 5% 10%, #0000 50%),
+      linear-gradient(#d1a894, #b67562 25% 50%, #7d0d01 50%);
+  }
+
+  #code-widget {
+    animation: code-entrance 0.5s ease-in-out;
+  }
+
+  #code-widget-close.hover::before {
+    opacity: 1;
+    transition: opacity 0.1s linear;
+  }
+
+  #code-widget-close.active::before {
+    background:
+      url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAKCAYAAABi8KSDAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACUSURBVHgBlZFNCoQwDIVbmRvOMHOAAd0K/uDGlYKiCG4VPICi9yu0oCSQoFUXFtKEl6+voZXvr7sKay1TL690FOexY+Hz87i2decOuDKQsNGVe8AGYTRJIh0Y+orBvxszCPllOymlxN06jNE26Qnwg4zdHQLrMhFaawwAqAadDPE1ijwUxhiMKCmxCZk06OMYTz5lAx3xWDeXkLNAAAAAAElFTkSuQmCC")
+        no-repeat center,
+      var(--control-background),
+      var(--control-background-close-active);
+  }
+</style>
+<script type="module">
+  import {NOTIFY, CLICK} from './assets/sounds.js'
+
+  const widgetLifetime = 15;
+  const widget = document.querySelector("#code-widget");
+  const widgetProgress = widget.querySelector("#code-progress");
+  const widgetCloseButton = widget.querySelector("#code-widget-close");
+  const cursor = document.querySelector("#cursor");
+
+  async function wait(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  NOTIFY.play()
+  await wait(1000);
+  widgetProgress.style.animation = `lose-progress ${widgetLifetime}s linear`;
+  await wait(widgetLifetime * 1000 - 1);
+  widgetProgress.style.width = "100%"
+
+  const rect = widgetCloseButton.getBoundingClientRect();
+
+  cursor.style.opacity = "1";
+  cursor.style.top = `${Math.floor(Math.random() * 50 + 25).toFixed(0)}vh`;
+  cursor.style.left = `${Math.floor(Math.random() * 50 + 25).toFixed(0)}vw`;
+  await wait(50);
+  cursor.style.transition = "all 2s ease-in-out";
+  cursor.style.top = `${rect.top + rect.height / 2}px`;
+  cursor.style.left = `${rect.left + rect.width / 2}px`;
+
+  await wait(1800);
+  widgetCloseButton.classList.add("hover");
+  await wait(200);
+
+  widgetCloseButton.classList.add("active");
+  cursor.style.transition = undefined;
+  CLICK.play()
+  await wait(250);
+  widgetCloseButton.classList.remove("hovered", "active");
+  cursor.style.opacity = 0;
+  widget.style.animationName = "code-exit";
+  widget.style.opacity = 0;
+  await wait(500);
+  [...widget.parentElement.children].forEach((e) => e.remove());
+</script>
+<div class="absolute left-8 bottom-8" id="code-widget">
+  <div class="window active">
+    <div class="title-bar">
+      <div class="title-bar-text pr-4">New claim code!</div>
+      <div class="title-bar-controls">
+        <button aria-label="Close" id="code-widget-close"></button>
+      </div>
+    </div>
+    <div class="window-body has-space">
+      <p class="w-full text-center text-lg">$claim {{claim_code}}</p>
+      <div
+        class="w-full bg-green-100 h-1"
+        style="transition: width 60s linear"
+      ></div>
+      <div
+        class="animate"
+        role="progressbar"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="100"
+      >
+        <div id="code-progress" style="width: 0%"></div>
+      </div>
+    </div>
+  </div>
+</div>

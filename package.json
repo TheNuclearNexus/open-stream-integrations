@@ -1,0 +1,17 @@
+{
+  "name": "wheel-website",
+  "version": "1.0.0",
+  "scripts": {
+    "format": "prettier --write --ignore-unknown .",
+    "tailwind": "tailwindcss build --watch -o ./assets/main.css",
+    "rust": "cargo watch -x run -w templates -w src -w assets -w .env",
+    "dev": "concurrently -r \"npm run tailwind\" \"npm run rust\""
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "prettier": "^3.2.5",
+    "prettier-plugin-tailwindcss": "^0.5.11",
+    "tailwindcss": "^3.4.1"
+  }
+}

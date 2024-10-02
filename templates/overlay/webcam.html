@@ -1,0 +1,46 @@
+<div
+  class="absolute"
+  id="webcam-widget"
+  sse-swap="webcam"
+  hx-swap="outerHTML"
+  style="left: {{ transform.position_x }}px; top: {{ transform.position_y }}px;"
+>
+  <style>
+    #webcam-window:before {
+      --edge: calc(100% - 6px);
+      clip-path: polygon(
+        0% 0%,
+        0% 100%,
+        6px var(--edge),
+        6px 6px,
+        var(--edge) 6px,
+        var(--edge) var(--edge),
+        6px var(--edge),
+        0px 100%,
+        100% 100%,
+        100% 0%
+      );
+    }
+  </style>
+  <div
+    id="webcam-window"
+    class="window active flex flex-col relative"
+    style="left: -6px; top: -27px"
+  >
+    <div class="title-bar">
+      <div class="title-bar-text pr-4">{{ config.twitch.channel }}</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize"></button>
+        <button aria-label="Maximize" disabled></button>
+        <button aria-label="Close"></button>
+      </div>
+    </div>
+    <div
+      class="window-body has-space flex"
+      style="
+        width: calc({{transform.width}}px - {{ transform.crop_left + transform.crop_right}}px * {{transform.scale_x}}); 
+        height: calc({{transform.height}}px - {{ transform.crop_top + transform.crop_bottom }}px * {{ transform.scale_y }});
+        background-color: transparent;"
+    ></div>
+  </div>
+</div>

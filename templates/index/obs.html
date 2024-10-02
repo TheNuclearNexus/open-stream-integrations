@@ -1,0 +1,52 @@
+{% import "./elements.html" as elements %}
+
+<label>Connected: <b>{{ obs.connected }}</b></label>
+<label
+  >Address:
+  <input
+    name="obs.address"
+    type="text"
+    placeholder="IP Address..."
+    value="{{ config.obs.address }}"
+  />
+</label>
+<label
+  >Main scene:
+  <select
+    name="obs.main_scene"
+    type="text"
+    placeholder="Main Scene..."
+    value="{{ config.obs.main_scene }}"
+    hx-get="/api/config/elements"
+    hx-swap="innerHTML"
+    hx-target="#obs-webcam-element"
+    hx-include="none"
+    hx-vals="js:{scene: event.target.value}"
+    {% if !obs.connected %}
+        disabled
+    {% endif %}
+  >
+    {% for scene in obs.scenes %}
+    <option {% if scene.name == config.obs.main_scene %} selected {% endif %}>
+      {{ scene.name }}
+    </option>
+    {% endfor %}
+  </select>
+</label>
+<label
+  >Webcam Element:
+  <select
+    id="obs-webcam-element"
+    name="obs.webcam_element"
+    type="text"
+    placeholder="Webcam Element..."
+    value="{{ config.obs.webcam_element }}"
+    hx-trigger="changed"
+    {% if !obs.connected || obs.elements.is_none() %}
+        disabled
+    {% endif %}
+  >
+    {% call elements::elements(obs.elements, Some(config.obs.webcam_element)) %}
+  </select>
+</label>
+<button hx-post="/api/config/refresh_obs" hx-target="closest article">Refresh</button>

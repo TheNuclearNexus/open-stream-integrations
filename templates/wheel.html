@@ -1,0 +1,150 @@
+<style>
+    @keyframes text-entrance {
+        0% {
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        95% {
+            transform: scale(125%);
+        }
+
+        100% {
+            opacity: 1;
+            transform: scale(100%);
+        }
+    }
+
+    @keyframes text-exit {
+        0% {
+            opacity: 1;
+            margin-top: 0;
+        }
+
+        100% {
+            opacity: 0;
+            margin-top: -68px;
+        }
+    }
+
+    @keyframes wheel-entrance {
+        0% {
+            opacity: 0;
+            margin-bottom: -50%;
+        }
+
+        100% {
+            opacity: 1;
+            margin-bottom: 0;
+        }
+    }
+
+    @keyframes wheel-exit {
+        0% {
+            opacity: 1;
+        }
+        100% {
+            opacity: 0;
+        }
+        
+    }
+
+    @keyframes winner-entrance {
+        0% {
+            transform: scale(0%);
+        }
+
+        100% {
+            transform: scale(100%);
+        }
+    }
+    @keyframes winner-exit {
+        0% {
+            transform: scale(100%);
+        }
+
+        100% {
+            transform: scale(0%);
+        }
+    }
+</style>
+<script type="module">
+    import { Wheel } from 'https://cdn.jsdelivr.net/npm/spin-wheel@4.3.1/dist/spin-wheel-esm.js';
+
+    function cubicInOut(t) {
+        return ((t *= 2) <= 1 ? t * t * t : (t -= 2) * t * t + 2) / 2;
+    }
+
+    // 1. Configure the wheel's properties:
+    const props = {
+        name: 'Games',
+        radius: 0.84,
+        itemLabelRadius: 0.93,
+        itemLabelRadiusMax: 0.35,
+        itemLabelRotation: 180,
+        itemLabelAlign: 'left',
+        itemLabelColors: ['#fff'],
+        itemLabelBaselineOffset: -0.07,
+        itemLabelFont: 'Lexend',
+        itemLabelFontSizeMax: 55,
+        itemBackgroundColors: ['#ffc93c', '#66bfbf', '#a2d5f2', '#515070', '#43658b', '#ed6663', '#d54062'],
+        rotationSpeedMax: 500,
+        rotationResistance: -100,
+        lineWidth: 1,
+        lineColor: '#fff',
+        overlayImage: '/assets/overlay.svg',
+        items: [
+            /*{{items|safe}}*/
+        ]
+    }
+
+    // 2. Decide where you want it to go:
+    const wheelText = document.querySelector('.wheel-text')
+    const wheelWinner = document.querySelector('.wheel-winner')
+    const wheelContainer = document.querySelector('.wheel-container');
+    const wheelObject = new Wheel(wheelContainer, props)
+
+    document.querySelector('.wheel-widget').style.opacity = 1
+
+    const winningItem = {{winning_item}};
+
+    wheelWinner.style.display = 'none'
+
+    wheelText.style.animation = 'text-entrance ease-in-out 2s'
+
+    async function wait(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms))
+    }
+
+    await wait(3000)
+    wheelContainer.style.opacity = 1
+    wheelContainer.style.marginBottom = 0;
+    wheelContainer.style.animation = 'wheel-entrance ease-out 1s'
+
+    await wait(1000)
+    wheelObject.spinToItem(winningItem, 5000, false, 2, 1, cubicInOut)
+    await wait(2000)
+    wheelText.style.animation = 'text-exit ease-in-out 1s'
+    await wait(1000)
+    wheelText.style.display = 'none'
+    await wait(2000)
+    wheelWinner.innerHTML = props.items[wheelObject.getCurrentIndex()].label
+    wheelWinner.style.display = 'flex'
+    wheelWinner.style.animation = 'winner-entrance ease-in-out 0.5s'
+    await wait(2000)
+    wheelContainer.style.opacity = 0;
+    wheelContainer.style.animation = 'wheel-exit ease-in-out 0.5s'
+    wheelWinner.style.transform = 'scale(0%)'
+    wheelWinner.style.animation = 'winner-exit ease-in-out 0.5s'
+</script>
+<div class="wheel-widget w-full h-full flex justify-center items-center flex-col overflow-hidden font-[Lexend]" style="opacity: 0;">
+    <div class="wheel-text text-3xl h-min text-center text-white bg-gray-900 p-4 box-border rounded-2xl">
+        Look's like someone spun the wheel!
+    </div>
+    <div class="wheel-container w-[80%]" style="opacity: 0; margin-bottom: -33%;">
+
+    </div>
+    <div class="wheel-winner absolute text-3xl text-white bg-gray-900 p-4 box-border rounded-2xl">
+
+    </div>
+</div>

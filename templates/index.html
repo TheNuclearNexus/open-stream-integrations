@@ -1,0 +1,187 @@
+<!-- prettier-ignore -->
+{% extends "base.html" %}
+
+{% block title %}App{% endblock %}
+
+
+
+{% block content %}
+<script type="module">
+  import { unflatten } from "./assets/unflatten.js";
+
+  const config = document.getElementById("config");
+  config.addEventListener("htmx:configRequest", (evt) => {
+    const parameters = evt.detail.parameters;
+
+    evt.detail.parameters = unflatten(parameters);
+  });
+
+  function changeTab(e) {
+    e.preventDefault();
+    const target = e.target;
+    console.log(target);
+
+    config
+      .querySelectorAll("[role=tab]")
+      .forEach((e) => e.setAttribute("aria-selected", false));
+    config
+      .querySelectorAll("[role=tabpanel]")
+      .forEach((e) => e.setAttribute("hidden", "true"));
+
+    target.setAttribute("aria-selected", true);
+    config
+      .querySelector(`#${target.getAttribute("aria-controls")}`)
+      .removeAttribute("hidden");
+  }
+
+  config
+    .querySelectorAll("[role=tab]")
+    .forEach((e) => e.addEventListener("click", changeTab));
+</script>
+<style>
+  form#config {
+    display: flex;
+    flex-direction: column;
+    width: 24rem;
+    min-height: 16rem;
+
+    div.window-body {
+      height: 100%;
+    }
+
+    div > section {
+      article:not([hidden]) {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      label {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      input {
+        margin-left: auto;
+      }
+    }
+  }
+</style>
+<div class="w-full h-screen flex flex-col justify-center items-center gap-4">
+  <h2>Testing</h2>
+  <div class="flex flex-row gap-4">
+    <button class="" hx-trigger="click" hx-swap="none" hx-post="/api/wheel">
+      Spin Wheel
+    </button>
+    <button
+      class=""
+      hx-trigger="click"
+      hx-swap="none"
+      hx-post="/api/claim_code"
+    >
+      Generate Code
+    </button>
+  </div>
+  <form
+    id="config"
+    hx-trigger="submit"
+    hx-post="/api/config"
+    hx-ext="json-enc"
+    hx-swap="innerHTML"
+    hx-target="#save-results"
+    class="window active"
+  >
+    <div class="title-bar">
+      <div class="title-bar-text">Config</div>
+    </div>
+    <div class="window-body has-space flex flex-col">
+      <section class="tabs">
+        <menu role="tablist" aria-label="Config Categories">
+          <button
+            id="tab-0"
+            role="tab"
+            aria-controls="tab-claims"
+            aria-selected="true"
+          >
+            Claims
+          </button>
+          <button
+            id="tab-1"
+            role="tab"
+            aria-controls="tab-wheel"
+            aria-selected="false"
+          >
+            Wheel
+          </button>
+          <button
+            id="tab-2"
+            role="tab"
+            aria-controls="tab-obs"
+            aria-selected="false"
+          >
+            OBS
+          </button>
+          <button
+            id="tab-3"
+            role="tab"
+            aria-controls="tab-twitch"
+            aria-selected="false"
+          >
+            Twitch
+          </button>
+        </menu>
+        <article role="tabpanel" id="tab-claims">
+          <label
+            >Interval:
+            <input
+              name="claims.interval"
+              type="number"
+              placeholder="Minutes..."
+              value="{{ config.claims.interval }}"
+            />
+          </label>
+          <label
+            >Points Per Claim:
+            <input
+              name="claims.points_per"
+              type="number"
+              placeholder="Points..."
+              value="{{ config.claims.points_per }}"
+            />
+          </label>
+        </article>
+        <article role="tabpanel" id="tab-wheel"> 
+          <label
+            >Cost:
+            <input
+              name="wheel.cost"
+              type="number"
+              placeholder="Points..."
+              value="{{ config.wheel.cost }}"
+            />
+          </label>
+        </article>
+        <article role="tabpanel" id="tab-obs" hidden>
+          {% include "index/obs.html" %}
+        </article>
+        <article id="tab-twitch" role="tabpanel" hidden>
+          <label>
+            Channel:
+            <input
+              name="twitch.channel"
+              type="text"
+              placeholder="Channel..."
+              value="{{ config.twitch.channel }}"
+            />
+          </label>
+        </article>
+      </section>
+      <section class="field-row" style="justify-content: end; flex-grow: 1; align-items: end;">
+        <span id="save-results"></span>
+        <button>Save</button>
+      </section>
+    </div>
+  </form>
+</div>
+{% endblock %}

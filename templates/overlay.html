@@ -1,0 +1,34 @@
+{% extends "base.html" %} {% block title %}App{% endblock %} {% block content %}
+<style>
+  body {
+    background-color: transparent !important;
+  }
+</style>
+<div
+  class="w-screen h-screen top-0 left-0 absolute bg-transparent flex justify-center"
+  hx-ext="sse"
+  sse-connect="/sse"
+>
+  <div
+    hx-trigger="sse:wheel"
+    hx-get="/api/wheel"
+    class="flex justify-center w-screen h-screen absolute"
+  ></div>
+  <div
+    hx-trigger="sse:claim_code"
+    hx-get="/api/claim_code"
+    class="flex justify-center w-screen h-screen overflow-hidden absolute"
+  ></div>
+
+  {% if webcam_transform.is_some() %}
+    {% set transform = webcam_transform.clone().unwrap() %}
+    {% include "overlay/webcam.html" %}
+  {% endif %}
+
+  <div id="cursor" class="absolute top-0 left-0" style="z-index: 10000; opacity: 0;">
+    <img src="http://www.rw-designer.com/cursor-extern.php?id=163617" />
+  </div>
+</div>
+<audio id="sfx-notify" src="./assets/sounds/notify.wav" style="display: none;"></audio> 
+<audio id="sfx-click" src="./assets/sounds/click.wav" style="display: none;"></audio> 
+{% endblock %}

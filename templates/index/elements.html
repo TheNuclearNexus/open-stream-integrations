@@ -1,0 +1,15 @@
+{% macro elements(elements, selected_element) %}
+    {% if elements.is_some() %}
+        {% set elements = elements.as_ref().unwrap() %}
+        {% for element in elements %}
+            {% set name = element.source_name.clone() %}
+            <option 
+                {% if selected_element.is_some() && Some(name) == selected_element %} 
+                    selected 
+                {% endif %}
+            >
+                {{ name }}
+            </option>
+        {% endfor %}
+    {% endif %}
+{% endmacro %}
